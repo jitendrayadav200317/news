@@ -1,10 +1,10 @@
-import { removeCookie, setCookie } from '../../utils/utils';
+import { removeCookie, setCookie, getCookie } from '../../utils/utils';
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
-import { auth, googleAuthProvider } from './../../config/firebase.js';
+import { googleProvider, auth } from "../../config/firebase.js"; 
 import { signInWithPopup } from 'firebase/auth';
-import { getCookie } from '../../utils/utils';
 import { toast } from 'sonner';
+
 const initialState = {
   loading: false,
   authenticated: getCookie('isAuthenticated') || false,
@@ -48,11 +48,10 @@ export const login = createAsyncThunk(
   }
 );
 
-export const signInWithGoogle = createAsyncThunk('/google-login', async () => {
+export const signInWithGoogle = createAsyncThunk('/google-login', async (_, { rejectWithValue }) => {
   try {
-    const result = await signInWithPopup(auth, googleAuthProvider);
+    const result = await signInWithPopup(auth, googleProvider); // ✅ fixed
     const idToken = await result.user.getIdToken();
-    console.log(idToken);
 
     const res = await axios.post(
       `${import.meta.env.VITE_API_URL}/auth/google`,
@@ -60,7 +59,9 @@ export const signInWithGoogle = createAsyncThunk('/google-login', async () => {
     );
 
     return res.data;
-  } catch (err) {}
+  } catch (err) {
+    return rejectWithValue(err); // ✅ handled
+  }
 });
 
 const authSlice = createSlice({
@@ -83,14 +84,14 @@ const authSlice = createSlice({
       })
       .addCase(SignUp.fulfilled, (state, action) => {
         state.loading = false;
-        console.log(action.payload.message);
         toast.success(action.payload.message);
       })
       .addCase(SignUp.rejected, (state, action) => {
-        console.log(action.payload);
         state.loading = false;
-        toast.error(action.payload.response.data.message);
+        const msg = action.payload?.response?.data?.message || "Registration failed";
+        toast.error(msg);
       })
+
       .addCase(login.pending, (state) => {
         state.loading = true;
       })
@@ -104,21 +105,15 @@ const authSlice = createSlice({
         setCookie('name', action.payload.name);
         setCookie('id', action.payload.id);
         state.preferences = action.payload.preferences;
-        localStorage.setItem(
-          'preferences',
-          JSON.stringify(action.payload.preferences)
-        );
-        console.log(action.payload);
+        localStorage.setItem('preferences', JSON.stringify(action.payload.preferences));
         toast.success(action.payload.message);
       })
       .addCase(login.rejected, (state, action) => {
-        console.log(action.payload);
-        toast.error(action.payload.response.data.message);
         state.loading = false;
+        const msg = action.payload?.response?.data?.message || "Login failed";
+        toast.error(msg);
       })
-      .addCase(signInWithGoogle.pending, (state, action) => {
-        // state.loading = true;
-      })
+
       .addCase(signInWithGoogle.fulfilled, (state, action) => {
         state.authenticated = action.payload.authenticated;
         state.name = action.payload.name;
@@ -128,12 +123,12 @@ const authSlice = createSlice({
         setCookie('name', action.payload.name);
         setCookie('id', action.payload.id);
         state.preferences = action.payload.preferences;
-        localStorage.setItem(
-          'preferences',
-          JSON.stringify(action.payload.preferences)
-        );
-        console.log(action.payload);
+        localStorage.setItem('preferences', JSON.stringify(action.payload.preferences));
         toast.success(action.payload.message);
+      })
+      .addCase(signInWithGoogle.rejected, (state, action) => {
+        const msg = action.payload?.response?.data?.message || "Google sign-in failed";
+        toast.error(msg);
       });
   },
 });

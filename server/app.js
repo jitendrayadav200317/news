@@ -13,7 +13,7 @@ import aiRoutes from './routes/aiRoutes.js';
 import News from './model/News.js';
 import cron from 'node-cron';
 import admin from 'firebase-admin'
-import serviceAccount from  './key/news-al-8f677-firebase-adminsdk-fbsvc-48645d0e8c.json'  with { type: "json" } ;
+// import serviceAccount from  './key/news-al-8f677-firebase-adminsdk-fbsvc-48645d0e8c.json'  with { type: "json" } ;
 
 
 
@@ -32,9 +32,9 @@ dotenv.config();
 
 dbConnect();
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
-});
+// admin.initializeApp({
+//   credential: admin.credential.cert(serviceAccount)
+// });
 
 const serviceAccount = {
   type: process.env.FIREBASE_TYPE,
@@ -49,9 +49,9 @@ const serviceAccount = {
   client_x509_cert_url: process.env.FIREBASE_CLIENT_X509_CERT_URL
 };
 
-// admin.initializeApp({
-//   credential: admin.credential.cert(serviceAccount),
-// });
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
 
 const countries = ['us', 'uk', 'fr', 'in', 'it'];
 const categories = [

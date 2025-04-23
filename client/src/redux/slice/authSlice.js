@@ -50,7 +50,7 @@ export const login = createAsyncThunk(
 
 export const signInWithGoogle = createAsyncThunk('/google-login', async (_, { rejectWithValue }) => {
   try {
-    const result = await signInWithPopup(auth, googleProvider); // ✅ fixed
+    const result = await signInWithPopup(auth, googleProvider);
     const idToken = await result.user.getIdToken();
 
     const res = await axios.post(
@@ -60,7 +60,7 @@ export const signInWithGoogle = createAsyncThunk('/google-login', async (_, { re
 
     return res.data;
   } catch (err) {
-    return rejectWithValue(err); // ✅ handled
+    return rejectWithValue(err); 
   }
 });
 

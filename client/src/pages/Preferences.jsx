@@ -7,7 +7,7 @@ import { setPreferences } from '../redux/slice/newsSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
-import './preference.css';
+// import './preference.css';
 
 function Preferences() {
   const navigate = useNavigate();

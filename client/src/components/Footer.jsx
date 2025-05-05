@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 import { Button } from "@mantine/core";
 import { Twitter, Facebook, Instagram, Linkedin } from "lucide-react";
@@ -13,12 +12,19 @@ const Footer = () => {
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
         
     
-        <motion.div cd cl
+        {/* <motion.div cd cl
           className="flex flex-col space-y-4"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-        >
+        > */}
+        <motion.div
+  className="flex flex-col space-y-4"
+  initial={{ opacity: 0, y: 30 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.5 }}
+>
+
           <h2 className="text-2xl font-bold">AI News Aggregator</h2>
           <p className="text-gray-400">
             Stay updated with the latest AI-powered news summaries and insights.

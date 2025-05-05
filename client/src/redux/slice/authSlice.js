@@ -13,6 +13,7 @@ const initialState = {
   preferences: JSON.parse(localStorage.getItem('preferences')) || [],
 };
 
+// SignUp AsyncThunk
 export const SignUp = createAsyncThunk(
   '/register',
   async (data, { rejectWithValue }) => {
@@ -23,11 +24,17 @@ export const SignUp = createAsyncThunk(
       );
       return res.data;
     } catch (error) {
-      return rejectWithValue(error);
+      return rejectWithValue({
+        message: error.message,
+        code: error.code,
+        status: error.response?.status,
+        data: error.response?.data,
+      });
     }
   }
 );
 
+// Login AsyncThunk
 export const login = createAsyncThunk(
   '/login',
   async (data, { rejectWithValue }) => {
@@ -37,17 +44,29 @@ export const login = createAsyncThunk(
         data,
         { withCredentials: true }
       );
+
+      // Verifying user after login
       const verifyres = await axios.get(
         `${import.meta.env.VITE_API_URL}/auth/verify`,
         { withCredentials: true }
       );
+      
       return { ...res.data, ...verifyres.data };
     } catch (error) {
-      return rejectWithValue(error);
+      // Detailed logging for debugging
+      console.error('Login error:', error);
+
+      return rejectWithValue({
+        message: error.message,
+        code: error.code,
+        status: error.response?.status,
+        data: error.response?.data,
+      });
     }
   }
 );
 
+// Google Sign-In AsyncThunk
 export const signInWithGoogle = createAsyncThunk('/google-login', async (_, { rejectWithValue }) => {
   try {
     const result = await signInWithPopup(auth, googleProvider);
@@ -60,7 +79,12 @@ export const signInWithGoogle = createAsyncThunk('/google-login', async (_, { re
 
     return res.data;
   } catch (err) {
-    return rejectWithValue(err); 
+    return rejectWithValue({
+      message: err.message,
+      code: err.code,
+      status: err.response?.status,
+      data: err.response?.data,
+    });
   }
 });
 
@@ -100,12 +124,15 @@ const authSlice = createSlice({
         state.authenticated = action.payload.authenticated;
         state.name = action.payload.name;
         state.id = action.payload.id;
+
+        // Set cookies and local storage
         setCookie('isAuthenticated', action.payload.authenticated);
         setCookie('email', action.payload.email);
         setCookie('name', action.payload.name);
         setCookie('id', action.payload.id);
         state.preferences = action.payload.preferences;
         localStorage.setItem('preferences', JSON.stringify(action.payload.preferences));
+        
         toast.success(action.payload.message);
       })
       .addCase(login.rejected, (state, action) => {
@@ -118,12 +145,15 @@ const authSlice = createSlice({
         state.authenticated = action.payload.authenticated;
         state.name = action.payload.name;
         state.id = action.payload.id;
+
+        // Set cookies and local storage
         setCookie('isAuthenticated', action.payload.authenticated);
         setCookie('email', action.payload.email);
         setCookie('name', action.payload.name);
         setCookie('id', action.payload.id);
         state.preferences = action.payload.preferences;
         localStorage.setItem('preferences', JSON.stringify(action.payload.preferences));
+
         toast.success(action.payload.message);
       })
       .addCase(signInWithGoogle.rejected, (state, action) => {

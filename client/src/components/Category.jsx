@@ -1,22 +1,22 @@
-import React from 'react';
-import { Tabs } from '@mantine/core';
-import axios from 'axios';
-import { useState } from 'react';
-import { useInfiniteQuery } from '@tanstack/react-query';
-import InfiniteScroll from 'react-infinite-scroll-component';
-import ArticleCard from './ArticleCard';
-import { Skeleton } from '@mantine/core';
+import React from "react";
+import { Tabs } from "@mantine/core";
+import axios from "axios";
+import { useState } from "react";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import InfiniteScroll from "react-infinite-scroll-component";
+import ArticleCard from "./ArticleCard";
+import { Skeleton } from "@mantine/core";
 function Category() {
-  const [category, setCategory] = useState('general');
+  const [category, setCategory] = useState("general");
   console.log(category);
   const categories = [
-    'General',
-    'Sports',
-    'Politics',
-    'Business',
-    'Entertainment',
-    'Health',
-    'Science',
+    "General",
+    "Sports",
+    "Politics",
+    "Business",
+    "Entertainment",
+    "Health",
+    "Science",
   ];
 
   const fetchNewsByCategory = async ({ pageParam = 1 }) => {
@@ -30,7 +30,7 @@ function Category() {
 
   const { data, hasNextPage, fetchNextPage, status, isLoading } =
     useInfiniteQuery({
-      queryKey: ['category', category],
+      queryKey: ["category", category],
       queryFn: fetchNewsByCategory,
       getNextPageParam: (lastPage) => {
         // console.log('lastPage: ', lastPage);
@@ -51,8 +51,13 @@ function Category() {
         onChange={(value) => setCategory(value.toLowerCase())}
       >
         <Tabs.List size={20}>
-          {categories.map((cat) => (
+          {/* {categories.map((cat) => (
             <Tabs.Tab value={cat}>{cat}</Tabs.Tab>
+          ))} */}
+          {categories.map((cat) => (
+            <Tabs.Tab key={cat} value={cat}>
+              {cat}
+            </Tabs.Tab>
           ))}
         </Tabs.List>
       </Tabs>
@@ -68,12 +73,12 @@ function Category() {
           next={fetchNextPage}
           hasMore={hasNextPage}
           loader={
-            <p style={{ textAlign: 'center', margin: '20px 20px' }}>
+            <p style={{ textAlign: "center", margin: "20px 20px" }}>
               Loading ...
             </p>
           }
           endMessage={
-            <p style={{ textAlign: 'center', marginTop: '20px' }}>
+            <p style={{ textAlign: "center", marginTop: "20px" }}>
               No more news
             </p>
           }
@@ -82,14 +87,18 @@ function Category() {
             <div className="space-y-6">
               <Skeleton height={500} />
               <Skeleton height={20} />
-              <Skeleton height={30}/>
+              <Skeleton height={30} />
             </div>
           ) : (
             <div className="space-y-6">
               {data?.pages.length >= 0 &&
                 data?.pages.map((page, index) =>
                   page.news.map((article) => (
-                    <ArticleCard article={article} category={category} />
+                    <ArticleCard
+                      key={article._id || article.url}
+                      article={article}
+                      category={category}
+                    />
                   ))
                 )}
             </div>

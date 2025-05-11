@@ -24,6 +24,7 @@
     "mongoose": "^8.10.0",
     "morgan": "^1.10.0",
     "node-cron": "^3.0.3",
-    "puppeteer": "^24.3.0"
+    "puppeteer": "^24.3.0",
+    "vercel": "^41.7.4"
   }
 }

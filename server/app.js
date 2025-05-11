@@ -40,7 +40,7 @@ admin.initializeApp({
 app.use(
   cors({
     credentials: true,
-    origin: 'http://localhost:5173',
+    origin: 'https://news-gamma-tan.vercel.app/',
   })
 );
 app.use(cookieParser());

@@ -40,7 +40,8 @@ admin.initializeApp({
 app.use(
   cors({
     credentials: true,
-    origin: 'https://news-jet-three.vercel.app/login',
+    // origin: 'https://news-jet-three.vercel.app/login',
+    origin: 'http://localhost:5173',
   })
 );
 app.use(cookieParser());

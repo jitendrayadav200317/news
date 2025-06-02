@@ -40,7 +40,8 @@ admin.initializeApp({
 app.use(
   cors({
     credentials: true,
-    origin: 'https://news-one-ruby.vercel.app/login',
+    // origin: 'https://news-one-ruby.vercel.app/login',
+    origin: 'https://news-wheat-tau.vercel.app/login',
   })
 );
 app.use(cookieParser());

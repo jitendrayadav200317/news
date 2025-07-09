@@ -1,21 +1,21 @@
-import { removeCookie, setCookie, getCookie } from '../../utils/utils';
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
-import { googleProvider, auth } from "../../config/firebase.js"; 
-import { signInWithPopup } from 'firebase/auth';
-import { toast } from 'sonner';
+import { removeCookie, setCookie, getCookie } from "../../utils/utils";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "axios";
+import { googleProvider, auth } from "../../config/firebase.js";
+import { signInWithPopup } from "firebase/auth";
+import { toast } from "sonner";
 
 const initialState = {
   loading: false,
-  authenticated: getCookie('isAuthenticated') || false,
-  name: getCookie('name') || null,
-  id: getCookie('id') || null,
-  preferences: JSON.parse(localStorage.getItem('preferences')) || [],
+  authenticated: getCookie("isAuthenticated") || false,
+  name: getCookie("name") || null,
+  id: getCookie("id") || null,
+  preferences: JSON.parse(localStorage.getItem("preferences")) || [],
 };
 
 // SignUp AsyncThunk
 export const SignUp = createAsyncThunk(
-  '/register',
+  "/register",
   async (data, { rejectWithValue }) => {
     try {
       const res = await axios.post(
@@ -36,7 +36,7 @@ export const SignUp = createAsyncThunk(
 
 // Login AsyncThunk
 export const login = createAsyncThunk(
-  '/login',
+  "/login",
   async (data, { rejectWithValue }) => {
     try {
       const res = await axios.post(
@@ -50,11 +50,11 @@ export const login = createAsyncThunk(
         `${import.meta.env.VITE_API_URL}/auth/verify`,
         { withCredentials: true }
       );
-      
+
       return { ...res.data, ...verifyres.data };
     } catch (error) {
       // Detailed logging for debugging
-      console.error('Login error:', error);
+      console.error("Login error:", error);
 
       return rejectWithValue({
         message: error.message,
@@ -67,38 +67,41 @@ export const login = createAsyncThunk(
 );
 
 // Google Sign-In AsyncThunk
-export const signInWithGoogle = createAsyncThunk('/google-login', async (_, { rejectWithValue }) => {
-  try {
-    const result = await signInWithPopup(auth, googleProvider);
-    const idToken = await result.user.getIdToken();
+export const signInWithGoogle = createAsyncThunk(
+  "/google-login",
+  async (_, { rejectWithValue }) => {
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      const idToken = await result.user.getIdToken();
 
-    const res = await axios.post(
-      `${import.meta.env.VITE_API_URL}/auth/google`,
-      { idToken }
-    );
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/auth/google`,
+        { idToken }
+      );
 
-    return res.data;
-  } catch (err) {
-    return rejectWithValue({
-      message: err.message,
-      code: err.code,
-      status: err.response?.status,
-      data: err.response?.data,
-    });
+      return res.data;
+    } catch (err) {
+      return rejectWithValue({
+        message: err.message,
+        code: err.code,
+        status: err.response?.status,
+        data: err.response?.data,
+      });
+    }
   }
-});
+);
 
 const authSlice = createSlice({
-  name: 'auth',
+  name: "auth",
   initialState,
   reducers: {
     signOut: function (state) {
       state.authenticated = false;
       state.id = null;
       state.name = null;
-      removeCookie('isAuthenticated');
-      removeCookie('name');
-      removeCookie('id');
+      removeCookie("isAuthenticated");
+      removeCookie("name");
+      removeCookie("id");
     },
   },
   extraReducers: (builder) => {
@@ -112,7 +115,8 @@ const authSlice = createSlice({
       })
       .addCase(SignUp.rejected, (state, action) => {
         state.loading = false;
-        const msg = action.payload?.response?.data?.message || "Registration failed";
+        const msg =
+          action.payload?.response?.data?.message || "Registration failed";
         toast.error(msg);
       })
 
@@ -126,13 +130,16 @@ const authSlice = createSlice({
         state.id = action.payload.id;
 
         // Set cookies and local storage
-        setCookie('isAuthenticated', action.payload.authenticated);
-        setCookie('email', action.payload.email);
-        setCookie('name', action.payload.name);
-        setCookie('id', action.payload.id);
+        setCookie("isAuthenticated", action.payload.authenticated);
+        setCookie("email", action.payload.email);
+        setCookie("name", action.payload.name);
+        setCookie("id", action.payload.id);
         state.preferences = action.payload.preferences;
-        localStorage.setItem('preferences', JSON.stringify(action.payload.preferences));
-        
+        localStorage.setItem(
+          "preferences",
+          JSON.stringify(action.payload.preferences)
+        );
+
         toast.success(action.payload.message);
       })
       .addCase(login.rejected, (state, action) => {
@@ -147,17 +154,21 @@ const authSlice = createSlice({
         state.id = action.payload.id;
 
         // Set cookies and local storage
-        setCookie('isAuthenticated', action.payload.authenticated);
-        setCookie('email', action.payload.email);
-        setCookie('name', action.payload.name);
-        setCookie('id', action.payload.id);
+        setCookie("isAuthenticated", action.payload.authenticated);
+        setCookie("email", action.payload.email);
+        setCookie("name", action.payload.name);
+        setCookie("id", action.payload.id);
         state.preferences = action.payload.preferences;
-        localStorage.setItem('preferences', JSON.stringify(action.payload.preferences));
+        localStorage.setItem(
+          "preferences",
+          JSON.stringify(action.payload.preferences)
+        );
 
         toast.success(action.payload.message);
       })
       .addCase(signInWithGoogle.rejected, (state, action) => {
-        const msg = action.payload?.response?.data?.message || "Google sign-in failed";
+        const msg =
+          action.payload?.response?.data?.message || "Google sign-in failed";
         toast.error(msg);
       });
   },
